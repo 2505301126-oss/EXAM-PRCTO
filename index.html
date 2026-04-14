@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FutureTech Assessment Portal (A.I. Engine)</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Heavy-Duty Professional TensorFlow AI Stack -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+
+    <style>
+        .profile-dropdown {
+            position: absolute;
+            top: 60px;
+            right: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            width: 150px;
+            padding: 0.5rem 0;
+            z-index: 100;
+        }
+
+        .profile-dropdown ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .profile-dropdown li {
+            padding: 0.8rem 1.2rem;
+            color: var(--text-color);
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 500;
+        }
+
+        .profile-dropdown li:hover {
+            background: rgba(6, 182, 212, 0.1);
+            color: var(--highlight-color);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Global Proctoring Overlays -->
+    <div class="test-freeze-overlay hidden" id="test-freeze-overlay">
+        <div class="freeze-alert-box">
+            <h2>🚨 SECURITY VIOLATION 🚨</h2>
+            <p id="freeze-reason">Multiple persons detected in frame.</p>
+            <p class="freeze-timer">Resuming in <span id="freeze-countdown">5</span>s once frame is clear...</p>
+        </div>
+    </div>
+
+    <div class="toast-notification hidden" id="camera-toast">Eye Tracker Warning</div>
+
+    <!-- 1. Intro Animation Sequence -->
+    <div class="intro-container" id="intro-container">
+        <h1 class="tagline" id="tagline">The Future is watching</h1>
+    </div>
+
+    <!-- 2. Secure Login Flow -->
+    <div class="login-container" id="login-container">
+        <div class="login-box" id="email-step">
+            <h2>Access Portal</h2>
+            <p>Enter your registered email ID to continue.</p>
+            <div class="input-group">
+                <input type="email" id="email-input" placeholder="someone@example.com" required>
+            </div>
+            <button id="send-otp-btn" class="btn-highlight">Send OTP</button>
+            <p id="email-error" class="error-text"></p>
+            <div style="margin-top:2rem; padding-top: 1rem; border-top: 1px solid #334155;">
+                <p class="link-text" id="teacher-login-btn" style="color: #F59E0B; font-weight:bold;">Teacher /
+                    Administrator Login</p>
+            </div>
+        </div>
+
+        <div class="login-box hidden" id="otp-step">
+            <h2>Authentication Code</h2>
+            <p>An OTP has been sent to <span id="sent-email-display" class="bold-text"></span>.</p>
+            <div class="input-group">
+                <input type="text" id="otp-input" placeholder="Enter 6-digit OTP" maxlength="6" required
+                    autocomplete="off">
+            </div>
+            <button id="verify-otp-btn" class="btn-primary">Verify OTP</button>
+            <p id="otp-error" class="error-text"></p>
+            <p class="mock-info">Demo Mode OTP: <strong>123456</strong></p>
+            <p class="link-text" id="change-email">Use another email</p>
+        </div>
+    </div>
+
+    <!-- Instruction Modal Bypassed/Removed -->
+
+    <!-- 3. Dashboard Container -->
+    <main class="dashboard-container" id="dashboard-container">
+        <header class="dashboard-header" id="dash-header-bar">
+            <div class="logo">FutureTech Assessment</div>
+            <!-- Profile with Dropdown -->
+            <div class="user-profile" id="user-profile-btn" style="position: relative; cursor: pointer;">
+                <div class="profile-info" id="profile-info-block">
+                    <span class="user-name">Harsh Shroti</span>
+                    <span class="user-id">ID: GU1126</span>
+                </div>
+                <div class="user-avatar"
+                    style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden; border: 2px solid var(--highlight-color);">
+                    <img src="user_profile.jpg" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="profile-dropdown hidden" id="profile-dropdown">
+                    <ul>
+                        <li id="logout-btn">Log Out</li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+
+        <section class="dashboard-content">
+            <h1 class="welcome-text" id="dash-welcome">Your Dashboard</h1>
+
+            <div class="dashboard-grid">
+
+                <div class="dash-card generic-stat-card stagger-reveal" style="animation-delay: 0.1s">
+                    <h3>Result</h3>
+                    <div class="value-display highlight-text" id="dashboard-result-display">--</div>
+                    <p class="card-desc" id="dashboard-result-desc">Overall Assessment Score</p>
+                </div>
+
+                <div class="dash-card active-timer-card generic-stat-card stagger-reveal" id="student-window-card"
+                    style="animation-delay: 0.3s">
+                    <h3>System Health</h3>
+                    <div class="value-display" style="font-size: 1.5rem">A.I. NOMINAL</div>
+                    <p class="card-desc">Hardware Sync Verified</p>
+                </div>
+
+                <div class="dash-card stagger-reveal" id="dashboard-test-block"
+                    style="grid-column: 1 / -1; display: flex; flex-direction: column; align-items: flex-start; animation-delay: 0.4s">
+                    <h3>Active Testing Window</h3>
+                    <div class="value-display timer-value"
+                        style="font-size: 1.8rem; font-family: monospace; color: var(--highlight-color); letter-spacing: 1px;">
+                        14 Apr - 18 Apr</div>
+                    <p class="card-desc">Scheduled Timeframe</p>
+                </div>
+
+                <!-- Post Submission: Student Confirmed Frame -->
+                <div class="dash-card full-width hidden" id="student-post-exam-status">
+                    <h3 style="color: #10B981; font-size: 1.4rem;" id="post-exam-title">Evaluation Submitted
+                        Successfully ✅</h3>
+                    <p class="card-desc" style="margin-top: 0.5rem; max-width: 600px;" id="post-exam-desc">Your test has
+                        been safely pushed to our servers. Your camera and microphone instances have been shut down and
+                        recording variables deactivated.</p>
+                </div>
+
+                <!-- TEACHER ONLY Restricted Threats Container (Initially Hidden) -->
+                <div class="dash-card full-width hidden" id="teacher-threats-box"
+                    style="border: 2px solid #DC2626; padding: 0;">
+                    <div
+                        style="background-color: #FEF2F2; padding: 1.5rem; border-bottom: 2px solid #DC2626; border-radius: 12px 12px 0 0; position: relative;">
+                        <div
+                            style="position: absolute; right: 1.5rem; top: 1.5rem; background: #DC2626; color: #fff; padding: 0.3rem 0.8rem; border-radius: 4px; font-weight: bold; font-size: 0.8rem;">
+                            TEACHER CLEARANCE ACTIVE</div>
+                        <h2 style="font-size: 1.5rem; color: #DC2626; font-weight: 800;">🔒 Restricted File: <span
+                                id="audit-test-name">Threats Audit</span></h2>
+                        <p class="card-desc" style="color: #991B1B;">This module isolates captured tracking vectors and
+                            anomalies strictly restricted from student access.</p>
+                    </div>
+
+                    <div style="padding: 2.5rem; display: flex; flex-direction: column; gap: 2rem;">
+                        <!-- OS Environment Window Threats -->
+                        <div id="os-window-threats"
+                            style="border-left:4px solid #DC2626; padding-left: 1.5rem; display: none;">
+                            <h3 style="color: #DC2626; font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem;">💻
+                                Operating System Defections</h3>
+                            <div class="log-details" id="os-logs-display"
+                                style="border-color: #DC2626; background: #FEF2F2;"></div>
+                        </div>
+
+                        <!-- Threats Sub-Box -->
+                        <div id="security-threats-box"
+                            style="border-left:4px solid #DC2626; padding-left: 1.5rem; display: none;">
+                            <h3 style="color: #DC2626; font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem;">🚨
+                                Retina / Kinematic Threats Detected</h3>
+                            <div class="detection-content" id="threats-gallery">
+                                <!-- Evidence Screenshots Render Here -->
+                            </div>
+                        </div>
+
+                        <!-- Video Sub-Box -->
+                        <div id="student-detection-box">
+                            <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem;">📹 Full Session Video
+                                Feed</h3>
+                            <div class="detection-content" style="margin-top:0;">
+                                <video id="recorded-video" controls playsinline></video>
+                                <div class="log-details" id="video-logs-display" style="border-color: #DC2626;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Audio Sub-Box -->
+                        <div id="sound-detection-box">
+                            <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem;">🔊 Acoustic Incident
+                                Feed</h3>
+                            <div class="detection-content" style="margin-top:0;">
+                                <audio id="recorded-audio" controls></audio>
+                                <div class="log-details" id="audio-logs-display" style="border-color: #DC2626;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Test Selection Dropdowns -->
+                <div class="dash-card full-width" id="dashboard-test-block">
+                    <h3>Test Schedule Information</h3>
+                    <p class="card-desc">Select a test to view schedule details.</p>
+
+                    <div class="dropdown-container">
+                        <button class="dropdown-btn" id="test-dropdown-btn">Select Assessment <span>▼</span></button>
+                        <ul class="dropdown-list hidden" id="test-dropdown-list">
+                            <!-- JS Renders Logic -->
+                        </ul>
+                    </div>
+                    <div class="test-details-container hidden" id="test-details-container"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 4. Test Interface Container -->
+    <main class="test-interface-container" id="test-interface-container">
+        <!-- New: Persistent Navigation Bar -->
+        <div id="test-nav-bar" class="test-nav-bar hidden">
+            <div class="nav-content">
+                <button class="back-link-btn" id="exit-test-paper">← Back to Dashboard</button>
+                <div class="nav-divider"></div>
+                <div id="nav-test-title" class="nav-test-title">Assessment in Progress</div>
+            </div>
+        </div>
+
+        <!-- Questions are injected here AFTER verification -->
+        <div id="dynamic-test-body" class="dynamic-test-body"></div>
+
+        <!-- New: Stepped Navigation Footer -->
+        <div id="test-nav-footer" class="test-nav-footer hidden">
+            <button class="nav-arrow-btn" id="prev-question" disabled>← Previous</button>
+            <div id="paging-status" class="paging-status">Question 1 of X</div>
+            <button class="nav-arrow-btn" id="next-question">Next →</button>
+        </div>
+    </main>
+
+    <!-- Test Outcome Modal (Hides Exam & Forces Dashboard Return) -->
+    <div class="test-freeze-overlay hidden" id="test-completion-modal" style="background: rgba(15, 23, 42, 0.98);">
+        <div class="freeze-alert-box"
+            style="background: var(--bg-color); border: 2px solid var(--highlight-color); max-width: 500px;">
+            <h2 style="color: var(--highlight-color);" id="modal-completion-title">Test Concluded</h2>
+
+            <div style="font-size: 3.5rem; font-weight: 800; color: var(--text-color); margin: 1.5rem 0;"
+                id="modal-final-score">Score: 0</div>
+
+            <div id="invigilator-notif"
+                style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10B981; padding: 1rem; border-radius: 8px; margin-bottom: 2.5rem;">
+                <p style="color: #10B981; font-weight: 700; margin: 0; font-size: 0.95rem;">✅ SECURITY AUDIT COMPLETE
+                </p>
+                <p style="color: rgba(255,255,255,0.7); margin: 0.5rem 0 0; font-size: 0.85rem; line-height: 1.4;">Your
+                    synchronized audio and video feed has been securely encrypted and transmitted to the invigilator for
+                    final verification.</p>
+            </div>
+
+            <div style="display: flex; gap: 1rem; flex-direction: column;">
+                <button class="btn-highlight" id="modal-btn-return-dashboard"
+                    style="font-size: 1.1rem; padding: 1.2rem; cursor: pointer;">Return to Home Dashboard</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Security Alert Modal (For Warnings 1 & 2) -->
+    <div class="modal-overlay hidden" id="security-alert-modal" style="z-index: 99999;">
+        <div class="proctor-modal" style="border: 2px solid #F59E0B; text-align: center;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+            <h2 style="color: #F59E0B; margin-bottom: 0.5rem;" id="security-alert-title">SECURITY WARNING</h2>
+            <p id="security-alert-message" style="font-size: 1.1rem; line-height: 1.5; margin-bottom: 1.5rem;"></p>
+            <div style="background: rgba(245, 158, 11, 0.1); padding: 0.8rem; border-radius: 6px; margin-bottom: 2rem;">
+                <p style="color: #F59E0B; font-weight: 700; margin: 0;" id="security-alert-count">Warning: 1/3</p>
+            </div>
+            <button class="btn-primary" id="btn-acknowledge-warning"
+                style="width: 100%; padding: 1rem; background: #F59E0B; color: #000;">I Acknowledge & Will
+                Refocus</button>
+        </div>
+    </div>
+
+    <!-- Proctoring Live View Window overlayed on tests -->
+    <div id="proctor-window" class="proctor-window hidden">
+        <canvas id="audio-visualizer" class="audio-visualizer"></canvas>
+        <div class="feed-container" style="position:relative; width: 100%; height: 180px; overflow:hidden;">
+            <video id="webcam-feed" autoplay muted playsinline
+                style="position:absolute; left:0; top:0; width:100%; height: 100%; object-fit:cover; transform: scaleX(-1);"></video>
+            <canvas id="tracking-canvas"
+                style="position:absolute; left:0; top:0; width:100%; height: 100%; pointer-events:none; object-fit:cover; transform: scaleX(-1);"></canvas>
+
+            <div class="tracking-overlay">
+                <div class="tracking-status" id="tracking-status"
+                    style="position:absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.8); color: #F59E0B; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold; transition: 0.2s;">
+                    Loading Retina Net...</div>
+            </div>
+
+            <!-- Biometric Guidance Grid (Integrated Scanning) -->
+            <div id="biometric-grid" class="biometric-grid hidden">
+                <div class="grid-oval"></div>
+                <div class="grid-crosshair-h"></div>
+                <div class="grid-crosshair-v"></div>
+                <div class="scanning-beam"></div>
+            </div>
+        </div>
+
+        <div id="warning-tracker-badge"
+            style="position:absolute; bottom: 10px; right: 10px; background: rgba(220,38,38,0.9); color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold; display:none;">
+            Warnings: 0/3</div>
+    </div>
+
+    <!-- Identity Verification Gateway (Integrated Dual-Pane Modal) -->
+    <div id="identity-sync-overlay" class="identity-sync-overlay hidden">
+        <div class="gateway-modal">
+            <h2 style="color: #fff; margin-bottom: 2rem; font-size: 1.5rem; letter-spacing: 2px;">SECURE IDENTITY
+                HANDSHAKE</h2>
+            <div class="sync-grid">
+                <!-- Pane A: Baseline Identity -->
+                <div class="sync-reference">
+                    <div class="pane-label">BASELINE IDENTITY</div>
+                    <img src="user_profile.jpg" alt="Ref" />
+                    <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.5rem;">Official Audit Image
+                        [MATCH REQUIRED]</p>
+                </div>
+
+                <!-- Pane B: Live A.I. Scan (Feed Teleports Here) -->
+                <div class="sync-live-box">
+                    <div class="pane-label">LIVE BIOMETRIC FEED</div>
+                    <div id="live-scan-window" class="live-scan-window">
+                        <!-- feed-container will be injected here during scan -->
+                        <div class="scan-placeholder">INITIALIZING SCANNER...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sync-footer">
+                <div class="sync-status-box" style="width: 100%;">
+                    <p id="identity-sync-label"
+                        style="margin-bottom: 1rem; font-weight: 700; color: var(--highlight-color);">ALIGN SUBJECT
+                        WITHIN OVAL TARGET</p>
+                    <div class="sync-progress-container">
+                        <div id="sync-progress-bar" class="sync-progress-bar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Interface Logic -->
+    <script src="script.js"></script>
+    <!-- Network Lockdown Overlay (Autonomous Pause) -->
+    <div id="network-lockdown-overlay" class="modal-overlay hidden" style="z-index: 100000; background: #000;">
+        <div class="proctor-modal" style="border: 2px solid #EF4444; text-align: center;">
+            <div class="network-offline-icon">📡❌</div>
+            <h2 style="color: #EF4444; margin: 1rem 0;">CONNECTION INTERRUPTED</h2>
+            <p style="font-size: 1rem; color: #fff; line-height: 1.6;">Your internet connection has been lost. To ensure
+                assessment integrity, the session has been **Hard-Locked**.</p>
+            <div style="background: rgba(239, 68, 68, 0.1); padding: 1rem; border-radius: 8px; margin-top: 1.5rem;">
+                <p style="color: #FCA5A5; font-weight: 700; margin: 0;">Portal Paused. Re-establishing link...</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
