@@ -1,0 +1,32 @@
+Software Requirements Specification (SRS)
+AI Assessment & High-Security Proctoring Portal
+1. Purpose
+The purpose of this system is to provide a high-integrity, automated examination environment that ensures student identity verification and real-time cheating prevention during assessments.
+
+2. Functional Requirements
+2.1 Identity Gateway (Biometric Handshake)
+R1.1 (Biometric Sync): The system MUST match the live video feed against the pre-uploaded Profile Photo baseline.
+R1.2 (Integrated UI): The scanning interface MUST be a dual-pane modal displaying the reference photo and the live A.I. stream side-by-side.
+R1.3 (Guided Alignment): The system MUST provide an animated "Cyber-Laser" scanning beam and a guidance grid (oval target) to help the participant align their face.
+R1.4 (Match Confirmation): The grid MUST change color (Green) to indicate a successful biometric lock.
+2.2 Assessment Execution
+R2.1 (Subject Selection): The user performs subject selection on the main dashboard via a secure dropdown.
+R2.2 (Autonomous Start): The selected test MUST begin automatically the moment identity verification hits 100%, with no additional clicks required.
+R2.3 (Stepped Navigation): Questions MUST be delivered one-at-a-time with "Previous" and "Next" arrows for focused assessment.
+2.3 Security & Proctoring (A.I. Guard)
+R3.1 (Violation Engine): The system MUST monitor for the following in real-time:
+Face Rotation: Unauthorized movement beyond the 20-degree secure zone.
+Object Detection: Presence of electronic devices (Cell phones, Laptops).
+Multiple Subjects: Presence of secondary faces in the frame.
+R3.3 (Warning System): The system MUST enforce a 3-Strike Policy. Each violation triggers a warning modal. The third violation triggers automated assessment submission.
+R3.4 (Network Resilience): The portal MUST hard-lock and pause if internet connectivity is lost, resuming only when the link is restored.
+R3.5 (Data Protection): Text selection, right-clicking, and copy-paste shortcuts MUST be globally disabled.
+3. Non-Functional Requirements
+Efficiency: Face verification MUST complete within 2.5 seconds of correct alignment.
+Latency: The transition from verification to test start MUST be instantaneous (<500ms).
+Security: The "PROCTORING ACTIVE" status MUST be visible at all times during the test.
+Immersivity: The video feed MUST automatically "dock" back to the corner after the identity handshake is completed.
+4. System Architecture
+Front-end: HTML5, Vanilla CSS3, Javascript (ES6+).
+AI Core: TensorFlow.js, BlazeFace (Facial tracking), COCO-SSD (Object detection).
+Video Handover: DOM-based "Feed Repatriation" logic.
