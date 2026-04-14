@@ -1,0 +1,12 @@
+Task Plan
+Open URL: Navigate to file:///Users/harshshroti/production%20portfolio/future_website/index.html. [ ]
+Wait for Animation: Wait 7 seconds for the intro. [ ]
+Screenshot 1: Capture the login screen. [ ]
+Enter Email: Type test@example.com. [ ]
+Send OTP: Click "Send OTP". [ ]
+Wait for OTP: Wait 2 seconds. [ ]
+Enter OTP: Type 123456. [ ]
+Verify OTP: Click "Verify OTP". [ ]
+Wait for Dashboard: Wait 2 seconds. [ ]
+Screenshot 2: Capture the dashboard. [ ]
+Analyze UI: Describe theme, colors, layout, and issues. [ ]
