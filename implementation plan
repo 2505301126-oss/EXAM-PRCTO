@@ -1,0 +1,34 @@
+Fast-Track Proctoring: Syntax Fix & Prompt Removal
+This plan addresses recent syntax errors caused by block mismatches and fulfills the request to remove redundant instruction prompts for a smoother, high-speed proctoring launch.
+
+User Review Required
+IMPORTANT
+
+Prompt Removal: I will remove the "TensorFlow Proctoring Required" instruction modal. Clicking "Start Exam Security Loop" (or your subject's start button) will now immediately trigger the camera and the integrated identity scan, fulfilling the "Fast and Easy" requirement.
+
+Syntax Restoration: I will fix the manual coding errors (',' expected and stray brackets) in script.js to restore full functionality to the proctoring engine.
+
+Proposed Changes
+Syntax & Logic Restoration (JS)
+[MODIFY] 
+script.js
+Fix setupAudioVisualizer:
+Remove the stray closing bracket at L613.
+Restore detectedPeak = false; and the peak detection logic inside the draw() loop.
+Fix State Transitions: Ensure trackingStatus and isIdentityVerified states are perfectly synchronized with the corner audio-visualizer.
+Bypass Modal: Update the dashboard "Start" buttons to skip the proctorModal and call btnAcceptProctor.click() (or its logic) directly.
+User Interface Cleanup (HTML/CSS)
+[MODIFY] 
+index.html
+Remove/Hide the proctor-modal-overlay structure to clean up the "Prompt" overhead.
+Ensure the feed-container is ready for the "Autonomous Scan" immediately.
+[MODIFY] 
+style.css
+Refine the audio-visualizer z-index to ensure it is always visible on top of the live feed shadows.
+Verification Plan
+Automated/Syntax Validation
+Run a syntax check (dry run) or verify the file renders without console errors.
+Manual Verification
+Fast Launch: Click "Start Exam" on any subject. Verify the Camera starts immediately without an instruction popup.
+Voice Graph: Speak/make noise; verify the cyan waveform reacts in the bottom of the proctoring window.
+Autonomous Start: Complete the face scan; verify the questions appear instantly and the corner video docks correctly
